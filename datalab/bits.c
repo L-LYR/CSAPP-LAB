@@ -141,10 +141,10 @@ NOTES:
  *   Max ops: 14
  *   Rating: 1
  */
-// x | y = ~(~x & ~y);
-// x ^ y = (~x & y) | (~y & x) = ~(~(~x & y) & ~(~y & x))
 int bitXor(int x, int y)
 {
+    // x | y = ~(~x & ~y);
+    // x ^ y = (~x & y) | (~y & x) = ~(~(~x & y) & ~(~y & x))
     return ~(~(~x & y) & ~(~y & x));
 }
 /* 
@@ -153,9 +153,9 @@ int bitXor(int x, int y)
  *   Max ops: 4
  *   Rating: 1
  */
-// minimum of two's complement integer is 0x80000000
 int tmin(void)
 {
+    // minimum of two's complement integer is 0x80000000
     return 1 << 31;
 }
 //2
@@ -166,15 +166,15 @@ int tmin(void)
  *   Max ops: 10
  *   Rating: 1
  */
-// maximum of two's complement number is 0x7fffffff
-// suppose x = 0x7fffffff
-// so x + x = -2 (0xfffffffe)
-// but x can be -1
-// when y = -1, !(y + y + 2) will be 1
-// when y = x, !(y + y + 2) will be 0
-// it's strange but it works.
 int isTmax(int x)
 {
+    // maximum of two's complement number is 0x7fffffff
+    // suppose x = 0x7fffffff
+    // so x + x = -2 (0xfffffffe)
+    // but x can be -1
+    // when y = -1, !(y + y + 2) will be 1
+    // when y = x, !(y + y + 2) will be 0
+    // it's strange but it works.
     return !((x + 2) + x) ^ !(x + x + 2);
 }
 /* 
@@ -185,9 +185,9 @@ int isTmax(int x)
  *   Max ops: 12
  *   Rating: 2
  */
-//just divide by 2 ^ n
 int allOddBits(int x)
 {
+    //just divide by 2 ^ n
     int h;
     h = (x >> 16) & x;
     h = (h >> 8) & h;
@@ -202,9 +202,9 @@ int allOddBits(int x)
  *   Max ops: 5
  *   Rating: 2
  */
-// use the generation method of the two's complement interger
 int negate(int x)
 {
+    // use the generation method of the two's complement interger
     return ~x + 1;
 }
 //3
@@ -219,9 +219,9 @@ int negate(int x)
  */
 int isAsciiDigit(int x)
 {
-    int h = !(x >> 6);                                     // judge whether the higher bit is 0
-    int l = !((x >> 4) ^ 3);                               // judge whether the high 4-bit is 0x30
-    int inRange = (!((x & 0xF) >> 3)) | (!((x & 7) >> 1)); // judge whether the low 4-bit is in range
+    int h = !(x >> 6);                                     // whether the higher bit is 0
+    int l = !((x >> 4) ^ 3);                               // whether the high 4-bit is 0x30
+    int inRange = (!((x & 0xF) >> 3)) | (!((x & 7) >> 1)); // whether the low 4-bit is in range
     return h & l & inRange;
 }
 /* 
@@ -233,7 +233,7 @@ int isAsciiDigit(int x)
  */
 int conditional(int x, int y, int z)
 {
-    int f = !x + ~0;
+    int f = !x + ~0; // if x != 0, f = -1, if x == 0, f = 0
     return (y & f) | (z & ~f);
 }
 /* 
@@ -245,12 +245,12 @@ int conditional(int x, int y, int z)
  */
 int isLessOrEqual(int x, int y)
 {
-    int xs = x >> 31 & 1;
-    int ys = y >> 31 & 1;
-    int p = x + ~y + 1;
-    int z = !p;
-    int ns = (!ys) & xs;
-    int s = (!((p >> 31) + 1)) & (!(ys ^ xs));
+    int xs = (x >> 31) & 1;                    // get the sign of x
+    int ys = (y >> 31) & 1;                    // get the sign of y
+    int p = x + ~y + 1;                        // calculate x - y, it may overflow, when they have different signs
+    int z = !p;                                // whether x == y
+    int ns = (!ys) & xs;                       // whether x and y have different signs
+    int s = (!((p >> 31) + 1)) & (!(ys ^ xs)); // x - y is negative and have the same sign
     return s | z | ns;
 }
 //4
@@ -264,8 +264,8 @@ int isLessOrEqual(int x, int y)
  */
 int logicalNeg(int x)
 {
-    int nx = ~x + 1;
-    return ((x >> 31) + 1) & ((nx >> 31) + 1);
+    int nx = ~x + 1;                           // get negative x
+    return ((x >> 31) + 1) & ((nx >> 31) + 1); // if the x and the nx have the same sign, x is 0, and the answer is 1
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -281,7 +281,41 @@ int logicalNeg(int x)
  */
 int howManyBits(int x)
 {
-    return 0;
+    // for negative number, we need to get the index of the highest bit 1 of ~x
+    // and for positive one is the index of the highest bit 1 of x, then plus one
+    // we will get the answer.
+    int ans = 0;
+    int s = (x >> 31) & 1; // get sign
+    x = ((s << 31) >> 31) ^ x;
+    // negative numbers get bitwise not.
+    // positive numbers stay the same.
+
+    // binary search
+    s = !!(x >> 16) << 4; // check 32~17
+    ans = s;
+    x = x >> s;
+
+    s = !!(x >> 8) << 3; // check 32~25 or 16~9
+    ans = s + ans;
+    x = x >> s;
+
+    s = !!(x >> 4) << 2; // check 32~29 24~21 16~13 or 8~5
+    ans = s + ans;
+    x = x >> s;
+
+    s = !!(x >> 2) << 1; // check 32~31 28~27 24~23 20~19 16~15 12~11 8~7 4~3
+    ans = s + ans;
+    x = x >> s;
+
+    s = !!(x >> 1); // check 32 30 28 26 24 22 20 18 16 14 12 10 8 6 4 2
+    ans = s + ans;
+    x = x >> s;
+
+    ans = ans + !!x; // last bit
+
+    ans = ans + 1; // add one for the sign bit
+
+    return ans;
 }
 //float
 /* 
@@ -297,7 +331,14 @@ int howManyBits(int x)
  */
 unsigned floatScale2(unsigned uf)
 {
-    return 2;
+    int F = 0x80000000;
+    int M = 0x007FFFFF;
+    int E = 0x7F800000;
+    if (!(uf & E)) // is non-format
+        uf = ((uf & M) << 1) | (uf & F);
+    else if (((uf & E) ^ E)) // not the Inf & NaN
+        uf = uf + 0x00800000;
+    return uf;
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
@@ -313,7 +354,28 @@ unsigned floatScale2(unsigned uf)
  */
 int floatFloat2Int(unsigned uf)
 {
-    return 2;
+    int F = 0x80000000; // sign bit, also the Inf
+    int M = 0x007FFFFF;
+    int E = 0x7F800000;
+
+    int bias = 127;
+
+    int s = (uf >> 31) & 1;          // sign
+    int e = ((uf & E) >> 23) - bias; // exp
+
+    uf = (uf & M) | 0x00800000;
+
+    if (e >= 32)
+        return F;
+    if (e < 0)
+        return 0;
+    if (e >= 23)
+        uf = uf << (e - 23);
+    else
+        uf = uf >> (23 - e);
+    if (s)
+        uf = ~uf + 1;
+    return uf;
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -330,5 +392,12 @@ int floatFloat2Int(unsigned uf)
  */
 unsigned floatPower2(int x)
 {
-    return 2;
+    unsigned inf = 0x7F800000;
+    int bias = 127;
+    int e = x + bias;
+    if (x < 0)
+        return 0;
+    if (e >= 255)
+        return inf;
+    return e << 23;
 }
