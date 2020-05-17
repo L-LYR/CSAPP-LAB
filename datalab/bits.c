@@ -170,12 +170,13 @@ int isTmax(int x)
 {
     // maximum of two's complement number is 0x7fffffff
     // suppose x = 0x7fffffff
-    // so x + x = -2 (0xfffffffe)
-    // but x can be -1
-    // when y = -1, !(y + y + 2) will be 1
-    // when y = x, !(y + y + 2) will be 0
-    // it's strange but it works.
-    return !((x + 2) + x) ^ !(x + x + 2);
+    // let y = x + 1 = 0x80000000
+    // we find that y + y = 0
+    // on the other side, if y + y = 0,
+    // y may be 0 or 0x80000000
+    // so we can just exclude 0 to judge the correct answer.
+
+    return (!((x + 1) + (x + 1))) & (!!(x + 1));
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
