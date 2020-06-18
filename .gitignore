@@ -11,7 +11,9 @@ Makefile
 README
 *.txt
 *.tar
-bomb*
+
 attack*
 ZY*
 *.pptx
+*.doc
+*.docx

