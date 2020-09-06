@@ -141,8 +141,7 @@ NOTES:
  *   Max ops: 14
  *   Rating: 1
  */
-int bitXor(int x, int y)
-{
+int bitXor(int x, int y) {
     // x | y = ~(~x & ~y);
     // x ^ y = (~x & y) | (~y & x) = ~(~(~x & y) & ~(~y & x))
     return ~(~(~x & y) & ~(~y & x));
@@ -153,8 +152,7 @@ int bitXor(int x, int y)
  *   Max ops: 4
  *   Rating: 1
  */
-int tmin(void)
-{
+int tmin(void) {
     // minimum of two's complement integer is 0x80000000
     return 1 << 31;
 }
@@ -166,8 +164,7 @@ int tmin(void)
  *   Max ops: 10
  *   Rating: 1
  */
-int isTmax(int x)
-{
+int isTmax(int x) {
     // maximum of two's complement number is 0x7fffffff
     // suppose x = 0x7fffffff
     // let y = x + 1 = 0x80000000
@@ -186,8 +183,7 @@ int isTmax(int x)
  *   Max ops: 12
  *   Rating: 2
  */
-int allOddBits(int x)
-{
+int allOddBits(int x) {
     //just divide by 2 ^ n
     int h;
     h = (x >> 16) & x;
@@ -203,8 +199,7 @@ int allOddBits(int x)
  *   Max ops: 5
  *   Rating: 2
  */
-int negate(int x)
-{
+int negate(int x) {
     // use the generation method of the two's complement interger
     return ~x + 1;
 }
@@ -218,11 +213,10 @@ int negate(int x)
  *   Max ops: 15
  *   Rating: 3
  */
-int isAsciiDigit(int x)
-{
-    int h = !(x >> 6);                                     // whether the higher bit is 0
-    int l = !((x >> 4) ^ 3);                               // whether the high 4-bit is 0x30
-    int inRange = (!((x & 0xF) >> 3)) | (!((x & 7) >> 1)); // whether the low 4-bit is in range
+int isAsciiDigit(int x) {
+    int h = !(x >> 6);                                      // whether the higher bit is 0
+    int l = !((x >> 4) ^ 3);                                // whether the high 4-bit is 0x30
+    int inRange = (!((x & 0xF) >> 3)) | (!((x & 7) >> 1));  // whether the low 4-bit is in range
     return h & l & inRange;
 }
 /* 
@@ -232,9 +226,8 @@ int isAsciiDigit(int x)
  *   Max ops: 16
  *   Rating: 3
  */
-int conditional(int x, int y, int z)
-{
-    int f = !x + ~0; // if x != 0, f = -1, if x == 0, f = 0
+int conditional(int x, int y, int z) {
+    int f = !x + ~0;  // if x != 0, f = -1, if x == 0, f = 0
     return (y & f) | (z & ~f);
 }
 /* 
@@ -244,14 +237,13 @@ int conditional(int x, int y, int z)
  *   Max ops: 24
  *   Rating: 3
  */
-int isLessOrEqual(int x, int y)
-{
-    int xs = (x >> 31) & 1;                    // get the sign of x
-    int ys = (y >> 31) & 1;                    // get the sign of y
-    int p = x + ~y + 1;                        // calculate x - y, it may overflow, when they have different signs
-    int z = !p;                                // whether x == y
-    int ns = (!ys) & xs;                       // whether x and y have different signs
-    int s = (!((p >> 31) + 1)) & (!(ys ^ xs)); // x - y is negative and have the same sign
+int isLessOrEqual(int x, int y) {
+    int xs = (x >> 31) & 1;                     // get the sign of x
+    int ys = (y >> 31) & 1;                     // get the sign of y
+    int p = x + ~y + 1;                         // calculate x - y, it may overflow, when they have different signs
+    int z = !p;                                 // whether x == y
+    int ns = (!ys) & xs;                        // whether x and y have different signs
+    int s = (!((p >> 31) + 1)) & (!(ys ^ xs));  // x - y is negative and have the same sign
     return s | z | ns;
 }
 //4
@@ -263,10 +255,9 @@ int isLessOrEqual(int x, int y)
  *   Max ops: 12
  *   Rating: 4 
  */
-int logicalNeg(int x)
-{
-    int nx = ~x + 1;                           // get negative x
-    return ((x >> 31) + 1) & ((nx >> 31) + 1); // if the x and the nx have the same sign, x is 0, and the answer is 1
+int logicalNeg(int x) {
+    int nx = ~x + 1;                            // get negative x
+    return ((x >> 31) + 1) & ((nx >> 31) + 1);  // if the x and the nx have the same sign, x is 0, and the answer is 1
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -280,41 +271,40 @@ int logicalNeg(int x)
  *  Max ops: 90
  *  Rating: 4
  */
-int howManyBits(int x)
-{
+int howManyBits(int x) {
     // for negative number, we need to get the index of the highest bit 1 of ~x
     // and for positive one is the index of the highest bit 1 of x, then plus one
     // we will get the answer.
     int ans = 0;
-    int s = (x >> 31) & 1; // get sign
+    int s = (x >> 31) & 1;  // get sign
     x = ((s << 31) >> 31) ^ x;
     // negative numbers get bitwise not.
     // positive numbers stay the same.
 
     // binary search
-    s = !!(x >> 16) << 4; // check 32~17
+    s = !!(x >> 16) << 4;  // check 32~17
     ans = s;
     x = x >> s;
 
-    s = !!(x >> 8) << 3; // check 32~25 or 16~9
+    s = !!(x >> 8) << 3;  // check 32~25 or 16~9
     ans = s + ans;
     x = x >> s;
 
-    s = !!(x >> 4) << 2; // check 32~29 24~21 16~13 or 8~5
+    s = !!(x >> 4) << 2;  // check 32~29 24~21 16~13 or 8~5
     ans = s + ans;
     x = x >> s;
 
-    s = !!(x >> 2) << 1; // check 32~31 28~27 24~23 20~19 16~15 12~11 8~7 4~3
+    s = !!(x >> 2) << 1;  // check 32~31 28~27 24~23 20~19 16~15 12~11 8~7 4~3
     ans = s + ans;
     x = x >> s;
 
-    s = !!(x >> 1); // check 32 30 28 26 24 22 20 18 16 14 12 10 8 6 4 2
+    s = !!(x >> 1);  // check 32 30 28 26 24 22 20 18 16 14 12 10 8 6 4 2
     ans = s + ans;
     x = x >> s;
 
-    ans = ans + !!x; // last bit
+    ans = ans + !!x;  // last bit
 
-    ans = ans + 1; // add one for the sign bit
+    ans = ans + 1;  // add one for the sign bit
 
     return ans;
 }
@@ -330,14 +320,13 @@ int howManyBits(int x)
  *   Max ops: 30
  *   Rating: 4
  */
-unsigned floatScale2(unsigned uf)
-{
+unsigned floatScale2(unsigned uf) {
     int F = 0x80000000;
     int M = 0x007FFFFF;
     int E = 0x7F800000;
-    if (!(uf & E)) // is non-format
+    if (!(uf & E))  // is non-format
         uf = ((uf & M) << 1) | (uf & F);
-    else if (((uf & E) ^ E)) // not the Inf & NaN
+    else if (((uf & E) ^ E))  // not the Inf & NaN
         uf = uf + 0x00800000;
     return uf;
 }
@@ -353,16 +342,15 @@ unsigned floatScale2(unsigned uf)
  *   Max ops: 30
  *   Rating: 4
  */
-int floatFloat2Int(unsigned uf)
-{
-    int F = 0x80000000; // sign bit, also the Inf
+int floatFloat2Int(unsigned uf) {
+    int F = 0x80000000;  // sign bit, also the Inf
     int M = 0x007FFFFF;
     int E = 0x7F800000;
 
     int bias = 127;
 
-    int s = (uf >> 31) & 1;          // sign
-    int e = ((uf & E) >> 23) - bias; // exp
+    int s = (uf >> 31) & 1;           // sign
+    int e = ((uf & E) >> 23) - bias;  // exp
 
     uf = (uf & M) | 0x00800000;
 
@@ -391,8 +379,7 @@ int floatFloat2Int(unsigned uf)
  *   Max ops: 30 
  *   Rating: 4
  */
-unsigned floatPower2(int x)
-{
+unsigned floatPower2(int x) {
     unsigned inf = 0x7F800000;
     int bias = 127;
     int e = x + bias;
