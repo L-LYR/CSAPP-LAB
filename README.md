@@ -16,3 +16,5 @@ This is my solutions to CSAPP labs.
 > ```
 >
 > You must do the last cmd before you want to run 32-bit program.
+
+> Environment: Manjaro 20.1 Mikah(x86-64 Linux 5.7.17-2-MANJARO)
